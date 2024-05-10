@@ -56,16 +56,15 @@ RUN set -eux; \
 # Copy project scripts/configs
 COPY conf/config /usr/local/etc/privoxy/
 COPY conf/privoxy-blocklist.conf conf/adblock-dyn.conf /usr/local/etc/privoxy-blocklist/
-#ADD https://github.com/Andrwe/privoxy-blocklist/releases/download/0.4.0/privoxy-blocklist.sh /usr/local/bin/
-ADD https://raw.githubusercontent.com/Andrwe/privoxy-blocklist/main/privoxy-blocklist.sh /usr/local/bin/
+ADD https://github.com/Andrwe/privoxy-blocklist/releases/download/0.4.0/privoxy-blocklist.sh /usr/local/bin/
 RUN sed -i -r "181,185s/^/#/" /usr/local/bin/privoxy-blocklist.sh
 COPY bin/docker-entrypoint.sh /usr/local/bin/
 
 # Set the correct permissions
 RUN set -eux; \
-    mkdir -p /usr/local/etc/privoxy/CA /var/local/etc/privoxy/certs; \
+    mkdir -p /usr/local/etc/privoxy/CA; \
     update-ca-certificates && ln -s /etc/ssl/certs/ca-certificates.crt /usr/local/etc/privoxy/CA/trustedCAs.pem; \
-    chown -R privoxy /usr/local/etc/privoxy /usr/local/etc/privoxy/CA /var/local/etc/privoxy/certs; \
+    chown -R privoxy /usr/local/etc/privoxy /usr/local/etc/privoxy/CA; \
     chmod 755 /usr/local/bin/docker-entrypoint.sh /usr/local/bin/privoxy-blocklist.sh;
 
 ENV ADBLOCK_URLS="${ADBLOCK_URLS:-https://easylist.to/easylist/easylist.txt}" \

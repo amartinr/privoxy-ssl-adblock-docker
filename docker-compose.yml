@@ -11,7 +11,6 @@ services:
       #- ADBLOCK_URLS=https://easylist.to/easylist/easylist.txt
     volumes:
       - privoxy-ca:/usr/local/etc/privoxy/CA
-      - /srv/privoxy-ssl-adblock/conf/user.action:/usr/local/etc/privoxy/user.action
     restart: unless-stopped
     hostname: "privoxy"
 

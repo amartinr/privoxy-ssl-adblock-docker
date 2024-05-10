@@ -1,0 +1,27 @@
+#version: 3.8
+services:
+  privoxy:
+    image: amartinr/privoxy-ssl-adblock
+    container_name: privoxy-ssl-adblock
+    ports:
+      - 127.0.0.1:8118:8118
+      - 172.16.1.1:8118:8118
+    environment:
+      - TZ=Europe/Madrid
+      - CERT_EMAIL=webmaster@lowendlab.com
+      - CERT_ORG=LowEndLab
+      #- ADBLOCK_URLS=https://easylist.to/easylist/easylist.txt
+    volumes:
+      - privoxy-ca:/usr/local/etc/privoxy/CA
+      - /srv/privoxy-ssl-adblock/conf/user.action:/usr/local/etc/privoxy/user.action
+    restart: unless-stopped
+    hostname: "privoxy"
+    networks:
+      - internal
+
+volumes:
+  privoxy-ca:
+
+networks:
+  internal:
+    external: true

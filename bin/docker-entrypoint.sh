@@ -18,4 +18,3 @@ function create_cert() {
     -c /usr/local/etc/privoxy-blocklist/privoxy-blocklist.conf
 
 /usr/local/sbin/privoxy --no-daemon /usr/local/etc/privoxy/config
-#exec "$@"

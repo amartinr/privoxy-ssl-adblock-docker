@@ -8,7 +8,6 @@ RUN set -eux; \
         -G nogroup \
         -H \
         -S \
-        -u 109 \
         privoxy; \
     mkdir -p /var/local/lib/privoxy/certs; \
     chown privoxy /var/local/lib/privoxy/certs; \
@@ -38,7 +37,7 @@ RUN set -eux; \
     cd /usr/local/src/privoxy-${PRIVOXY_VERSION}; \
     autoheader; \
     autoconf; \
-    ./configure --disable-toggle --disable-editor --disable-force --with-openssl --with-brotli; \
+    ./configure --disable-toggle --disable-editor --disable-force --enable-compression --with-docbook=no --with-openssl --with-brotli; \
     make; \
     make -s install USER=privoxy GROUP=nogroup; \
     rm -rf /usr/local/src/privoxy-${PRIVOXY_VERSION}; \
@@ -55,7 +54,7 @@ RUN set -eux; \
 
 # Copy project scripts/configs
 COPY conf/config /usr/local/etc/privoxy/
-COPY conf/privoxy-blocklist.conf conf/adblock-dyn.conf /usr/local/etc/privoxy-blocklist/
+COPY conf/privoxy-blocklist.conf /usr/local/etc/privoxy-blocklist/
 ADD https://github.com/Andrwe/privoxy-blocklist/releases/download/0.4.0/privoxy-blocklist.sh /usr/local/bin/
 RUN sed -i -r "181,185s/^/#/" /usr/local/bin/privoxy-blocklist.sh
 COPY bin/docker-entrypoint.sh /usr/local/bin/
@@ -64,14 +63,13 @@ COPY bin/docker-entrypoint.sh /usr/local/bin/
 RUN set -eux; \
     mkdir -p /usr/local/etc/privoxy/CA; \
     update-ca-certificates && ln -s /etc/ssl/certs/ca-certificates.crt /usr/local/etc/privoxy/CA/trustedCAs.pem; \
-    chown -R privoxy /usr/local/etc/privoxy /usr/local/etc/privoxy/CA; \
+    chown -R privoxy /usr/local/etc/privoxy/ /usr/local/etc/privoxy-blocklist/; \
     chmod 755 /usr/local/bin/docker-entrypoint.sh /usr/local/bin/privoxy-blocklist.sh;
 
-ENV ADBLOCK_URLS="${ADBLOCK_URLS:-https://easylist.to/easylist/easylist.txt}" \
-    ADBLOCK_FILTERS="" \
-    CERT_EMAIL="${CERT_EMAIL:-webmaster@example.com}" \
+ENV CERT_EMAIL="${CERT_EMAIL:-webmaster@example.com}" \
     CERT_ORG="${CERT_ORG:-Example}"
 
 USER privoxy
 WORKDIR /usr/local/etc/privoxy
 ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["/usr/local/sbin/privoxy", "--no-daemon", "/usr/local/etc/privoxy/config"]

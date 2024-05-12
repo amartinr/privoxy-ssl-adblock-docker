@@ -1,5 +1,4 @@
-FROM alpine:latest
-
+FROM alpine:latest AS builder
 # Create Privoxy User
 RUN set -eux; \
     adduser \
@@ -8,10 +7,7 @@ RUN set -eux; \
         -G nogroup \
         -H \
         -S \
-        privoxy; \
-    mkdir -p /var/local/lib/privoxy/certs; \
-    chown privoxy /var/local/lib/privoxy/certs; \
-    chmod 750 /var/local/lib/privoxy/certs;
+        privoxy;
 
 # Install build related stuff
 RUN set -eux; \
@@ -43,9 +39,29 @@ RUN set -eux; \
     rm -rf /usr/local/src/privoxy-${PRIVOXY_VERSION}; \
     apk del build-tools;
 
+FROM alpine:latest
+COPY --from=builder /usr/local /usr/local
+
+## Create Privoxy User
+RUN set -eux; \
+    adduser \
+        -D \
+        -h /usr/local/etc/privoxy \
+        -G nogroup \
+        -H \
+        -S \
+        privoxy; \
+    mkdir -p /var/local/lib/privoxy/certs; \
+    chown privoxy /var/local/lib/privoxy/certs; \
+    chmod 750 /var/local/lib/privoxy/certs;
+
 # Add system tools
 RUN set -eux; \
-    apk add --no-cache openssl ca-certificates bash sed;
+    apk add --no-cache openssl ca-certificates bash sed \
+        libc-dev \
+        zlib \
+        pcre \
+        brotli-libs;
 
 # Enable Privoxy HTTPS inspection
 RUN set -eux; \

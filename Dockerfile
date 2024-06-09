@@ -73,7 +73,7 @@ COPY conf/config /usr/local/etc/privoxy/
 COPY conf/privoxy-blocklist.conf /usr/local/etc/privoxy-blocklist/
 ADD https://github.com/Andrwe/privoxy-blocklist/releases/download/0.4.0/privoxy-blocklist.sh /usr/local/bin/
 RUN sed -i -r "181,185s/^/#/" /usr/local/bin/privoxy-blocklist.sh
-COPY bin/docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.sh /usr/local/bin/
 
 # Set the correct permissions
 RUN set -eux; \

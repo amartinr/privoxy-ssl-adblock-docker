@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Expire https inspection certificates
+
+set -e
+
+# skip in favour of systemd timer if called from cron.daily
+if [ -d /run/systemd/system ] && [ "$1" != "systemd-timer" ]; then
+    exit 0
+fi
+
+
+CERTDIR=/var/local/lib/privoxy/certs
+EXPIREDAYS=90
+
+if [ -d $CERTDIR ]; then
+    find $CERTDIR -type f -mtime +$EXPIREDAYS -print0 | xargs -0 -r rm -f
+fi

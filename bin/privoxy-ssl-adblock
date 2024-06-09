@@ -1,0 +1,8 @@
+#!/bin/sh
+CLEANUP_DELAY=86400
+
+while :; do
+    sleep $CLEANUP_DELAY & wait ${!}
+    printf "%s Info: Cleaning up privoxy temporary issued certificates...\n" "$(date '+%Y-%m-%d %H:%M:%S')" && \
+    /usr/local/bin/privoxy-cleanup
+done & /usr/local/sbin/privoxy --no-daemon /usr/local/etc/privoxy/config
